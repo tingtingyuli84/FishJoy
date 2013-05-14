@@ -36,6 +36,7 @@ import org.anddev.andengine.util.Callback;
 import org.anddev.andengine.util.MathUtils;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -378,7 +379,7 @@ public class FishJoy extends BaseGameActivity implements IOnSceneTouchListener, 
 		View view = LayoutInflater.from(this).inflate(R.layout.points_view, null);
 		ListView listView = (ListView)view.findViewById(R.id.listview_id);
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[]{
-				"30积分换取100个子弹","60积分换取100个子弹","100积分换取200个子弹"});
+				"30积分换取100个子弹","60积分换取240个子弹","200积分换取400个子弹"});
 		
 		listView.setAdapter(arrayAdapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -425,27 +426,50 @@ public class FishJoy extends BaseGameActivity implements IOnSceneTouchListener, 
 	public void addCoin(int which) {
 		points = IntegralSdk.getInstance().getSdkScore();
 		if (points <= 0) {
+			showNoPointDialog();
 			return;
 		}
-		int points[] = { 30, 50, 100 };
+		int pointsArray[] = { 30, 60, 200};
 		switch (which) {
 		case 0:
 			ModelInformationController.getInstance()
 					.getGameInformation(mDifficulty).setInitialCoin(100);
+			ArtilleryController.getInstance().addCoin(100);
 			break;
 		case 1:
 			ModelInformationController.getInstance()
-					.getGameInformation(mDifficulty).setInitialCoin(200);
+					.getGameInformation(mDifficulty).setInitialCoin(240);
+			ArtilleryController.getInstance().addCoin(240);
 			break;
 		case 2:
 			ModelInformationController.getInstance()
-					.getGameInformation(mDifficulty).setInitialCoin(300);
+					.getGameInformation(mDifficulty).setInitialCoin(400);
+			ArtilleryController.getInstance().addCoin(500);
 			break;
 		}
-		IntegralSdk.getInstance().consumeIntegral(points[which]);
+		//减少积分
+		points-=pointsArray[which];
+		//花费积分
+		IntegralSdk.getInstance().consumeIntegral(pointsArray[which]);
+		ArtilleryController.getInstance().showCoins(mScene);
 	}
 	
-	
+    
+    private void showNoPointDialog()
+	{
+		String message = "积分不足";
+		final Dialog dialog =new AlertDialog.Builder(this).setIcon(R.drawable.icon).setMessage(message).setPositiveButton("确定", 
+				new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dif, int posi)
+			{	
+				dif.dismiss();
+			}
+		}).create();
+		dialog.show();
+	}
+    
 
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, final TouchEvent pSceneTouchEvent) {

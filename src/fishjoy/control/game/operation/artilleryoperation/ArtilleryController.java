@@ -111,6 +111,12 @@ public class ArtilleryController implements GameConstants {
 		return null;
 	}
 
+	
+	public void addCoin(int value){
+		mInitialCoin+=value;
+	}
+	
+	
 	 public void showCoins(Scene scene) {
 		System.out.println("mInitialCoin "  + mInitialCoin);
 		int thousand = mInitialCoin/1000;
